@@ -1,3497 +1,471 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8">
+<meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#111827">
-<title>CommuWiki</title>
-
+<title>CommuWiki Snapshot</title>
 <style>
 *{box-sizing:border-box}
-
-:root{
- --bg:#080c13;
- --panel:#101722;
- --panel2:#151e2c;
- --panel3:#1b2637;
- --border:#28364b;
- --text:#edf3fb;
- --muted:#91a0b5;
- --accent:#5d8dff;
- --accent2:#795cff;
- --danger:#ef4444;
- --success:#22c55e;
- --warning:#f59e0b;
- --code:#080c12;
-}
-
-body.light{
- --bg:#f4f7fb;
- --panel:#fff;
- --panel2:#f0f3f8;
- --panel3:#e6ebf3;
- --border:#d4dce8;
- --text:#182235;
- --muted:#64748b;
- --code:#edf1f6;
-}
-
-html,body{
- margin:0;
- min-height:100%;
- background:var(--bg);
- color:var(--text);
- font-family:
-  Inter,
-  system-ui,
-  -apple-system,
-  BlinkMacSystemFont,
-  "Segoe UI",
-  sans-serif;
-}
-
-body{
- overflow-x:hidden;
-}
-
-button,
-input,
-textarea,
-select{
- font:inherit;
-}
-
-button{
- border:1px solid var(--border);
- background:var(--panel2);
- color:var(--text);
- border-radius:8px;
- padding:8px 12px;
- cursor:pointer;
- transition:.12s;
-}
-
-button:hover{
- border-color:var(--accent);
-}
-
-button.primary{
- background:var(--accent);
- color:#fff;
- border-color:var(--accent);
-}
-
-button.danger{
- background:var(--danger);
- color:#fff;
- border-color:var(--danger);
-}
-
-button.small{
- padding:5px 8px;
- font-size:12px;
-}
-
-button.icon{
- width:34px;
- height:34px;
- padding:0;
- display:grid;
- place-items:center;
-}
-
-input,
-textarea,
-select{
- border:1px solid var(--border);
- background:var(--panel);
- color:var(--text);
- outline:none;
- border-radius:8px;
-}
-
-input:focus,
-textarea:focus,
-select:focus{
- border-color:var(--accent);
-}
-
-.app{
- min-height:100vh;
- display:flex;
- flex-direction:column;
-}
-
-header{
- height:64px;
- display:flex;
- align-items:center;
- gap:9px;
- padding:0 16px;
- background:var(--panel);
- border-bottom:1px solid var(--border);
- position:sticky;
- top:0;
- z-index:30;
-}
-
-.logo{
- width:38px;
- height:38px;
- display:grid;
- place-items:center;
- border-radius:11px;
- background:linear-gradient(135deg,var(--accent),var(--accent2));
- color:#fff;
- font-weight:900;
-}
-
-.brand{
- font-weight:850;
-}
-
-.spacer{
- flex:1;
-}
-
-main{
- width:min(1550px,100%);
- margin:auto;
- padding:14px;
- flex:1;
-}
-
-.layout{
- display:grid;
- grid-template-columns:230px minmax(0,1fr);
- gap:12px;
-}
-
-.sidebar{
- background:var(--panel);
- border:1px solid var(--border);
- border-radius:12px;
- padding:10px;
- height:calc(100vh - 100px);
- position:sticky;
- top:78px;
- overflow:auto;
-}
-
-.side-title{
- font-size:12px;
- color:var(--muted);
- font-weight:800;
- padding:8px;
- text-transform:uppercase;
- letter-spacing:.06em;
-}
-
-.library-item{
- display:flex;
- align-items:center;
- gap:7px;
- padding:8px;
- border-radius:7px;
- cursor:pointer;
- font-size:13px;
- margin:2px 0;
-}
-
-.library-item:hover{
- background:var(--panel2);
-}
-
-.library-item.active{
- background:var(--panel3);
- color:#fff;
-}
-
-.library-item .name{
- flex:1;
- overflow:hidden;
- text-overflow:ellipsis;
- white-space:nowrap;
-}
-
-.content{
- min-width:0;
-}
-
-.search{
- display:flex;
- gap:7px;
- margin-bottom:10px;
-}
-
-.search input{
- flex:1;
- padding:9px 11px;
-}
-
-.editor-view{
- display:grid;
- grid-template-columns:minmax(0,1fr) minmax(0,1fr);
- min-height:680px;
- border:1px solid var(--border);
- border-radius:13px;
- overflow:hidden;
- background:var(--panel);
-}
-
-.pane{
- display:flex;
- flex-direction:column;
- min-width:0;
-}
-
-.pane+.pane{
- border-left:1px solid var(--border);
-}
-
-.pane-head{
- min-height:45px;
- display:flex;
- align-items:center;
- gap:7px;
- padding:7px 10px;
- border-bottom:1px solid var(--border);
- background:var(--panel2);
-}
-
-.pane-title{
- font-size:12px;
- color:var(--muted);
- font-weight:850;
-}
-
-.toolbar{
- display:flex;
- gap:4px;
- flex-wrap:wrap;
-}
-
-.toolbar button{
- padding:4px 7px;
- font-size:11px;
-}
-
-#editor{
- flex:1;
- width:100%;
- min-height:600px;
- resize:none;
- border:0;
- border-radius:0;
- padding:20px;
- outline:0;
- background:var(--panel);
- color:var(--text);
- font-family:
-  "Cascadia Code",
-  Consolas,
-  monospace;
- font-size:14px;
- line-height:1.7;
-}
-
-#viewer{
- flex:1;
- min-width:0;
- overflow:auto;
- padding:25px;
-}
-
-.markdown{
- line-height:1.7;
- word-break:break-word;
-}
-
-.markdown h1,
-.markdown h2,
-.markdown h3,
-.markdown h4,
-.markdown h5,
-.markdown h6{
- line-height:1.25;
- scroll-margin-top:80px;
-}
-
-.markdown h1{
- font-size:2em;
- border-bottom:1px solid var(--border);
- padding-bottom:8px;
-}
-
-.markdown h2{
- font-size:1.55em;
- border-bottom:1px solid var(--border);
- padding-bottom:5px;
-}
-
-.markdown h3{font-size:1.3em}
-
-.markdown a{
- color:#73a0ff;
-}
-
-.markdown img{
- max-width:100%;
- border-radius:8px;
-}
-
-.markdown blockquote{
- border-left:4px solid var(--accent);
- margin:15px 0;
- padding:5px 15px;
- color:var(--muted);
- background:var(--panel2);
-}
-
-.markdown hr{
- border:0;
- border-top:1px solid var(--border);
- margin:22px 0;
-}
-
-.markdown code{
- font-family:monospace;
- background:var(--code);
- border:1px solid var(--border);
- border-radius:5px;
- padding:2px 5px;
-}
-
-.markdown pre{
- background:var(--code);
- border:1px solid var(--border);
- border-radius:9px;
- padding:14px;
- overflow:auto;
-}
-
-.markdown pre code{
- border:0;
- background:none;
- padding:0;
-}
-
-.markdown table{
- width:100%;
- border-collapse:collapse;
- margin:15px 0;
-}
-
-.markdown th,
-.markdown td{
- border:1px solid var(--border);
- padding:7px 9px;
- text-align:left;
-}
-
-.markdown th{
- background:var(--panel2);
-}
-
-.markdown .wiki-link{
- color:#7ea8ff;
- text-decoration:none;
- border-bottom:1px dotted currentColor;
- cursor:pointer;
-}
-
-.toc{
- background:var(--panel2);
- border:1px solid var(--border);
- border-radius:9px;
- padding:12px;
- margin-bottom:20px;
-}
-
-.toc-title{
- font-weight:850;
- margin-bottom:7px;
-}
-
-.toc a{
- display:block;
- color:#73a0ff;
- text-decoration:none;
- font-size:13px;
- margin:3px 0;
-}
-
-.toc .l2{padding-left:12px}
-.toc .l3{padding-left:24px}
-.toc .l4{padding-left:36px}
-.toc .l5{padding-left:48px}
-.toc .l6{padding-left:60px}
-
-.status{
- display:flex;
- gap:9px;
- align-items:center;
- flex-wrap:wrap;
- color:var(--muted);
- font-size:11px;
- padding:9px 3px;
-}
-
-.status .strong{
- color:var(--text);
- font-weight:700;
-}
-
-.ok{color:var(--success)}
-.warn{color:var(--warning)}
-.lock{color:#fbbf24}
-
-.modal-bg{
- display:none;
- position:fixed;
- inset:0;
- z-index:100;
- align-items:center;
- justify-content:center;
- background:rgba(0,0,0,.72);
- padding:18px;
-}
-
-.modal-bg.open{
- display:flex;
-}
-
-.modal{
- width:min(520px,100%);
- max-height:90vh;
- overflow:auto;
- background:var(--panel);
- border:1px solid var(--border);
- border-radius:14px;
- padding:20px;
- box-shadow:0 30px 100px rgba(0,0,0,.5);
-}
-
-.modal h2{
- margin:0 0 7px;
-}
-
-.modal p{
- color:var(--muted);
- font-size:13px;
- line-height:1.6;
-}
-
-.modal input,
-.modal textarea,
-.modal select{
- width:100%;
- padding:10px;
- margin:5px 0;
-}
-
-.modal textarea{
- min-height:180px;
- resize:vertical;
-}
-
-.modal-actions{
- display:flex;
- justify-content:flex-end;
- gap:7px;
- margin-top:14px;
-}
-
-.option{
- padding:10px;
- border:1px solid var(--border);
- border-radius:8px;
- margin:6px 0;
-}
-
-.option input{
- width:auto;
- margin-right:6px;
-}
-
-.history{
- display:flex;
- flex-direction:column;
- gap:7px;
- max-height:500px;
- overflow:auto;
-}
-
-.history-item{
- border:1px solid var(--border);
- background:var(--panel2);
- padding:10px;
- border-radius:8px;
- display:flex;
- align-items:center;
- gap:8px;
-}
-
-.history-item .info{
- flex:1;
-}
-
-.history-item small{
- color:var(--muted);
- display:block;
- margin-top:2px;
-}
-
-.drop{
- display:none;
- position:fixed;
- inset:0;
- z-index:200;
- border:4px dashed var(--accent);
- background:rgba(93,141,255,.13);
- place-items:center;
- pointer-events:none;
-}
-
-.drop.show{
- display:grid;
-}
-
-.drop div{
- padding:25px 35px;
- background:var(--panel);
- border:1px solid var(--border);
- border-radius:12px;
- font-weight:800;
-}
-
-footer{
- text-align:center;
- color:var(--muted);
- font-size:10px;
- padding:13px;
-}
-
-@media(max-width:1000px){
- .layout{
-  grid-template-columns:1fr;
- }
-
- .sidebar{
-  height:auto;
-  position:static;
-  max-height:220px;
- }
-
- .editor-view{
-  grid-template-columns:1fr;
- }
-
- .pane+.pane{
-  border-left:0;
-  border-top:1px solid var(--border);
- }
-}
-
-@media(max-width:650px){
- header{
-  padding:0 8px;
- }
-
- header button{
-  padding:7px 8px;
-  font-size:11px;
- }
-
- .brand{
-  display:none;
- }
-
- main{
-  padding:7px;
- }
-
- #editor{
-  min-height:400px;
- }
-
- #viewer{
-  min-height:400px;
-  padding:18px;
- }
-}
+html,body{margin:0;width:100%;height:100%;font-family:"Segoe UI",Tahoma,sans-serif;color:#111;background:#fff}
+body{display:flex;flex-direction:column;overflow:hidden}
+button,input{font:inherit}
+button{border:1px solid #aaa;background:#f7f7f7;color:#111;padding:4px 10px;cursor:pointer}
+button:hover{background:#e9e9e9}
+button:active{background:#ddd}
+#menu{height:30px;display:flex;align-items:center;border-bottom:1px solid #aaa;background:#f3f3f3}
+.menuItem{height:29px;padding:5px 12px;cursor:pointer}
+.menuItem:hover{background:#ddd}
+#toolbar{height:43px;display:flex;align-items:center;gap:6px;padding:5px 8px;border-bottom:1px solid #aaa;background:#fafafa}
+#title{width:230px;height:29px;border:1px solid #aaa;padding:4px 7px}
+#toolbar .spacer{flex:1}
+#layout{min-height:0;flex:1;display:grid;grid-template-columns:minmax(0,1fr) 275px}
+#work{min-width:0;display:flex;flex-direction:column;border-right:1px solid #aaa}
+#tabs{height:34px;display:flex;align-items:stretch;border-bottom:1px solid #aaa;background:#f5f5f5}
+.tab{border:0;border-right:1px solid #bbb;background:#eee;padding:6px 15px}
+.tab.active{background:#fff;border-bottom:2px solid #333}
+#editorArea{position:relative;min-height:0;flex:1}
+#editor,#preview,#diff{position:absolute;inset:0;margin:0;padding:14px 16px;overflow:auto}
+#editor{width:100%;height:100%;border:0;outline:0;resize:none;background:#fff;color:#111;font:15px/1.55 Consolas,"Cascadia Mono","Courier New",monospace;tab-size:4}
+#preview{display:none;background:#fff;line-height:1.55}
+#diff{display:none;background:#fff;font:13px/1.45 Consolas,"Cascadia Mono","Courier New",monospace;white-space:pre-wrap}
+.md-h1{font-size:27px}.md-h2{font-size:22px}.md-h3{font-size:18px}
+#preview h1,#preview h2,#preview h3{border-bottom:1px solid #ddd;padding-bottom:4px}
+#preview blockquote{margin:8px 0;padding:5px 12px;border-left:4px solid #999;background:#f5f5f5}
+#preview pre{padding:10px;background:#f3f3f3;border:1px solid #ccc;overflow:auto}
+#preview code{font-family:Consolas,"Cascadia Mono","Courier New",monospace;background:#f1f1f1;padding:1px 3px}
+#preview pre code{background:none;padding:0}
+#preview table{border-collapse:collapse;margin:8px 0}
+#preview th,#preview td{border:1px solid #aaa;padding:5px 9px}
+#preview img{max-width:100%}
+#preview a{color:#0645ad}
+#side{min-width:0;display:flex;flex-direction:column;background:#fafafa}
+.sideHead{height:34px;padding:7px 9px;border-bottom:1px solid #aaa;font-weight:600;background:#eee}
+#history{min-height:0;flex:1;overflow:auto}
+.hist{padding:8px 9px;border-bottom:1px solid #ddd;cursor:pointer}
+.hist:hover{background:#e7e7e7}
+.histTitle{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.histMeta{font-size:11px;color:#555;margin-top:2px}
+#docs{max-height:35%;overflow:auto;border-top:1px solid #aaa}
+.doc{padding:7px 9px;border-bottom:1px solid #ddd;cursor:pointer}
+.doc:hover{background:#e7e7e7}
+#status{height:24px;border-top:1px solid #aaa;background:#eee;display:flex;align-items:center;padding:0 8px;font-size:12px;color:#333;gap:15px}
+#modalBack{position:fixed;inset:0;background:rgba(0,0,0,.25);display:none;align-items:center;justify-content:center}
+.modal{width:min(620px,calc(100vw - 30px));background:#fff;border:1px solid #666;box-shadow:0 5px 20px #555;padding:15px}
+.modal h3{margin:0 0 10px}
+.modal textarea,.modal input{width:100%;border:1px solid #aaa;padding:7px}
+.modal textarea{height:150px;font:13px Consolas,monospace}
+.modalFoot{display:flex;justify-content:flex-end;gap:6px;margin-top:12px}
+.small{font-size:12px;color:#555}
+.ok{color:#075f07}.bad{color:#a00}
+@media(max-width:800px){#layout{grid-template-columns:1fr}#side{display:none}#title{width:150px}}
 </style>
 </head>
-
 <body>
-
-<div class="app">
-
-<header>
- <div class="logo">CW</div>
- <div class="brand">CommuWiki</div>
-
- <div class="spacer"></div>
-
- <button onclick="newDocument()">새 문서</button>
- <button onclick="openHistory()" class="hide-mobile">기록</button>
- <button onclick="toggleTheme()">테마</button>
- <button onclick="requestEdit()" id="editButton" class="primary">편집</button>
- <button onclick="shareDocument()" class="primary">공유</button>
-</header>
-
-<main>
-
-<div class="layout">
-
-<aside class="sidebar">
-
- <div class="side-title">문서 라이브러리</div>
-
- <button
-  style="width:100%;margin-bottom:8px"
-  onclick="saveToLibrary()">
-  현재 문서 저장
- </button>
-
- <div id="library"></div>
-
-</aside>
-
-<section class="content">
-
- <div class="search">
-  <input
-   id="searchInput"
-   placeholder="문서 검색..."
-   oninput="searchDocument()">
-
-  <button onclick="clearSearch()">초기화</button>
- </div>
-
- <div class="editor-view">
-
-  <section class="pane">
-
-   <div class="pane-head">
-
-    <span class="pane-title">MARKDOWN</span>
-
-    <div class="spacer"></div>
-
-    <div class="toolbar">
-
-     <button onclick="insertSyntax('# ')">H1</button>
-     <button onclick="insertSyntax('## ')">H2</button>
-     <button onclick="insertSyntax('**text**')">B</button>
-     <button onclick="insertSyntax('*text*')">I</button>
-     <button onclick="insertSyntax('`code`')">Code</button>
-     <button onclick="insertSyntax('- ')">List</button>
-     <button onclick="insertSyntax('- [ ] ')">Task</button>
-     <button onclick="insertSyntax('> ')">Quote</button>
-     <button onclick="insertSyntax('```\\n\\n```')">CodeBlock</button>
-
-     <button onclick="undo()">Undo</button>
-     <button onclick="redo()">Redo</button>
-
+<div id="menu">
+  <div class="menuItem" data-menu="file">File</div>
+  <div class="menuItem" data-menu="edit">Edit</div>
+  <div class="menuItem" data-menu="view">View</div>
+  <div class="menuItem" data-menu="tools">Tools</div>
+</div>
+<div id="toolbar">
+  <input id="title" value="Untitled Snapshot" aria-label="Title">
+  <button id="saveBtn">Save Snapshot</button>
+  <button id="previewBtn">Preview</button>
+  <button id="codeBtn">Code</button>
+  <button id="diffBtn">Diff</button>
+  <button id="shareBtn">Share</button>
+  <span class="spacer"></span>
+  <button id="newBtn">New</button>
+</div>
+<div id="layout">
+  <section id="work">
+    <div id="tabs">
+      <button class="tab active" id="codeTab">Code</button>
+      <button class="tab" id="previewTab">Preview</button>
+      <button class="tab" id="diffTab">Diff</button>
     </div>
-
-   </div>
-
-   <textarea
-    id="editor"
-    spellcheck="false"
-    oninput="editorChanged()"
-    onkeydown="editorKeydown(event)"
-    placeholder="Markdown을 입력하세요..."></textarea>
-
+    <div id="editorArea">
+      <textarea id="editor" spellcheck="false" placeholder="# Markdown&#10;&#10;Write Markdown here."></textarea>
+      <div id="preview"></div>
+      <div id="diff"></div>
+    </div>
   </section>
-
-  <section class="pane">
-
-   <div class="pane-head">
-    <span class="pane-title">PREVIEW</span>
-
-    <div class="spacer"></div>
-
-    <button class="small" onclick="printDocument()">인쇄</button>
-    <button class="small" onclick="exportMarkdown()">MD</button>
-    <button class="small" onclick="exportJSON()">JSON</button>
-   </div>
-
-   <article id="viewer" class="markdown"></article>
-
-  </section>
-
- </div>
-
- <div class="status">
-
-  <span id="titleStatus" class="strong">문서</span>
-  <span id="stats">0자</span>
-  <span id="version">v1</span>
-  <span id="urlStats">URL 0B</span>
-  <span id="permission"></span>
-  <span id="saveStatus">저장됨</span>
-
-  <div class="spacer"></div>
-
-  <span>CommuWiki</span>
-
- </div>
-
-</section>
-
+  <aside id="side">
+    <div class="sideHead">Snapshot History</div>
+    <div id="history"></div>
+    <div class="sideHead">Local Documents</div>
+    <div id="docs"></div>
+  </aside>
+</div>
+<div id="status">
+  <span id="state">Ready</span>
+  <span id="counts">0 chars</span>
+  <span>SNAPSHOT</span>
 </div>
 
-</main>
-
-<footer>
- Serverless · No Database · URL Distributed · Single HTML
-</footer>
-
-</div>
-
-<div class="drop" id="drop">
- <div>Markdown 파일을 놓으세요</div>
-</div>
-
-<!-- NEW -->
-<div class="modal-bg" id="newModal">
-<div class="modal">
-
-<h2>새 문서</h2>
-
-<input id="newTitle" placeholder="문서 제목">
-
-<textarea id="newContent"># 새로운 문서
-
-내용을 입력하세요.</textarea>
-
-<div class="option">
-<label>
-<input
- type="radio"
- name="newPermission"
- value="public"
- checked
- onchange="permissionChanged()">
- 누구나 편집
-</label>
-</div>
-
-<div class="option">
-<label>
-<input
- type="radio"
- name="newPermission"
- value="password"
- onchange="permissionChanged()">
- 비밀번호로 편집 보호
-</label>
-</div>
-
-<div id="passwordSettings" style="display:none">
-
-<input
- id="newPassword"
- type="password"
- placeholder="편집 비밀번호">
-
-<label style="font-size:13px">
-<input
- id="newEncrypt"
- type="checkbox"
- style="width:auto">
- 본문 AES-256-GCM 암호화
-</label>
-
-</div>
-
-<div class="modal-actions">
-<button onclick="closeModal('newModal')">취소</button>
-<button class="primary" onclick="createDocument()">생성</button>
-</div>
-
-</div>
-</div>
-
-<!-- PASSWORD -->
-<div class="modal-bg" id="passwordModal">
-<div class="modal">
-
-<h2>비밀번호</h2>
-
-<p id="passwordMessage">
-편집 비밀번호를 입력하세요.
-</p>
-
-<input
- id="passwordInput"
- type="password"
- placeholder="비밀번호"
- onkeydown="if(event.key==='Enter')submitPassword()">
-
-<div class="modal-actions">
-<button onclick="closeModal('passwordModal')">취소</button>
-<button class="primary" onclick="submitPassword()">확인</button>
-</div>
-
-</div>
-</div>
-
-<!-- SHARE -->
-<div class="modal-bg" id="shareModal">
-<div class="modal">
-
-<h2>공유</h2>
-
-<p>
-이 주소 하나로 문서 전체를 전달할 수 있습니다.
-</p>
-
-<input id="shareURL" readonly>
-
-<div class="modal-actions">
-<button onclick="closeModal('shareModal')">닫기</button>
-<button class="primary" onclick="copyShareURL()">주소 복사</button>
-</div>
-
-</div>
-</div>
-
-<!-- HISTORY -->
-<div class="modal-bg" id="historyModal">
-<div class="modal">
-
-<h2>문서 기록</h2>
-
-<p>
-현재 브라우저에 저장된 이전 버전입니다.
-</p>
-
-<div class="history" id="historyList"></div>
-
-<div class="modal-actions">
-<button onclick="closeModal('historyModal')">닫기</button>
-</div>
-
-</div>
-</div>
-
-<!-- JSON -->
-<div class="modal-bg" id="jsonModal">
-<div class="modal">
-
-<h2>JSON 복원</h2>
-
-<textarea
- id="jsonInput"
- placeholder="CommuWiki JSON을 붙여넣으세요."></textarea>
-
-<div class="modal-actions">
-<button onclick="closeModal('jsonModal')">취소</button>
-<button class="primary" onclick="restoreJSON()">복원</button>
-</div>
-
-</div>
+<div id="modalBack">
+  <div class="modal">
+    <h3 id="modalTitle"></h3>
+    <div id="modalBody"></div>
+    <div class="modalFoot" id="modalFoot"></div>
+  </div>
 </div>
 
 <script>
 "use strict";
 
-/* =========================================================
-   CONSTANTS
-========================================================= */
+const KEY = "commuwiki-snapshot-v4";
+const DRAFT_KEY = KEY + ":draft";
+const HISTORY_KEY = KEY + ":history";
+const DOCS_KEY = KEY + ":docs";
+const MAX_HISTORY = 100;
+const MAX_DOCS = 40;
 
-const STORAGE_LIBRARY="commuwiki-library-v2";
-const STORAGE_DRAFT="commuwiki-draft-v2";
-const STORAGE_HISTORY="commuwiki-history-v2";
-const STORAGE_THEME="commuwiki-theme-v2";
+const $ = id => document.getElementById(id);
+const editor = $("editor");
+const title = $("title");
+let mode = "code";
+let dirty = false;
+let currentSnapshot = null;
+let undoStack = [];
+let redoStack = [];
+let lastEditValue = "";
+let lastEditTitle = "";
 
-const $=id=>document.getElementById(id);
-
-const DEFAULT={
- id:null,
- title:"CommuWiki",
- content:
-`# CommuWiki
-
-친구들과 정보를 공유하는 초경량 서버리스 위키입니다.
-
-## 기능
-
-- Markdown
-- URL 공유
-- 문서 라이브러리
-- 문서 기록
-- 검색
-- 비밀번호 보호
-- AES-256-GCM 암호화
-
-## Wiki 링크
-
-다른 문서로 연결하려면:
-
-[[다른 문서]]
-
-`,
- permission:"public",
- encrypted:false,
- passwordHash:"",
- salt:"",
- iv:"",
- ciphertext:"",
- version:1,
- updated:Date.now()
-};
-
-let doc=clone(DEFAULT);
-let editing=false;
-let unlocked=true;
-let currentPassword=null;
-let undoStack=[];
-let redoStack=[];
-let saveTimer=null;
-
-/* =========================================================
-   GENERAL
-========================================================= */
-
-function clone(v){
- return JSON.parse(JSON.stringify(v));
+function readJSON(k, fallback){
+  try { return JSON.parse(localStorage.getItem(k) || ""); }
+  catch(e){ return fallback; }
 }
-
-function randomID(){
- const a=crypto.getRandomValues(new Uint32Array(3));
- return Array.from(a)
-  .map(x=>x.toString(36))
-  .join("")
-  .slice(0,18);
+function writeJSON(k,v){ localStorage.setItem(k, JSON.stringify(v)); }
+function uid(){
+  return (crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36)+"-"+Math.random().toString(36).slice(2));
 }
-
-function bytes(s){
- return new TextEncoder().encode(s).length;
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 }
-
-function escapeHTML(s){
- return String(s)
-  .replace(/&/g,"&amp;")
-  .replace(/</g,"&lt;")
-  .replace(/>/g,"&gt;")
-  .replace(/"/g,"&quot;")
-  .replace(/'/g,"&#39;");
+function inlineMD(s){
+  s=escapeHtml(s);
+  s=s.replace(/!\[([^\]]*)\]\((https?:\/\/[^\s)]+)\)/g,'<img alt="$1" src="$2">');
+  s=s.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g,'<a href="$2" target="_blank" rel="noopener">$1</a>');
+  s=s.replace(/`([^`]+)`/g,'<code>$1</code>');
+  s=s.replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>');
+  s=s.replace(/__([^_]+)__/g,'<strong>$1</strong>');
+  s=s.replace(/~~([^~]+)~~/g,'<del>$1</del>');
+  s=s.replace(/\*([^*]+)\*/g,'<em>$1</em>');
+  s=s.replace(/_([^_]+)_/g,'<em>$1</em>');
+  return s;
 }
-
-function openModal(id){
- $(id).classList.add("open");
-}
-
-function closeModal(id){
- $(id).classList.remove("open");
-}
-
-document.querySelectorAll(".modal-bg").forEach(x=>{
- x.addEventListener("click",e=>{
-  if(e.target===x){
-   x.classList.remove("open");
-  }
- });
-});
-
-/* =========================================================
-   BASE64URL
-========================================================= */
-
-function b64(bytesArray){
-
- let s="";
-
- for(const x of bytesArray){
-  s+=String.fromCharCode(x);
- }
-
- return btoa(s)
-  .replace(/\+/g,"-")
-  .replace(/\//g,"_")
-  .replace(/=+$/,"");
-}
-
-function unb64(s){
-
- s=s.replace(/-/g,"+").replace(/_/g,"/");
-
- while(s.length%4) s+="=";
-
- const raw=atob(s);
-
- const out=new Uint8Array(raw.length);
-
- for(let i=0;i<raw.length;i++){
-  out[i]=raw.charCodeAt(i);
- }
-
- return out;
-}
-
-function encodeText(s){
- return new TextEncoder().encode(s);
-}
-
-function decodeText(a){
- return new TextDecoder().decode(a);
-}
-
-/* =========================================================
-   COMPRESS
-========================================================= */
-
-function compress(s){
-
- let out="";
- let i=0;
-
- while(i<s.length){
-
-  let bestLen=0;
-  let bestDist=0;
-
-  const start=Math.max(0,i-4096);
-
-  for(let j=i-1;j>=start;j--){
-
-   let k=0;
-
-   while(
-    k<255 &&
-    i+k<s.length &&
-    s[j+k]===s[i+k]
-   ){
-    k++;
-   }
-
-   if(k>=4 && k>bestLen){
-    bestLen=k;
-    bestDist=i-j;
-
-    if(k>=80) break;
-   }
-  }
-
-  if(bestLen>=4){
-
-   out+="~"+
-    bestDist.toString(36)+
-    "."+
-    bestLen.toString(36)+
-    "~";
-
-   i+=bestLen;
-
-  }else{
-
-   if(s[i]==="~"){
-    out+="~~";
-   }else{
-    out+=s[i];
-   }
-
-   i++;
-  }
- }
-
- return out;
-}
-
-function decompress(s){
-
- let out="";
- let i=0;
-
- while(i<s.length){
-
-  if(s[i]!=="~"){
-   out+=s[i++];
-   continue;
-  }
-
-  if(s[i+1]==="~"){
-   out+="~";
-   i+=2;
-   continue;
-  }
-
-  const end=s.indexOf("~",i+1);
-
-  if(end<0){
-   throw new Error("압축 데이터 종료 오류");
-  }
-
-  const token=s.slice(i+1,end);
-  const p=token.indexOf(".");
-
-  if(p<0){
-   throw new Error("압축 토큰 오류");
-  }
-
-  const dist=parseInt(token.slice(0,p),36);
-  const len=parseInt(token.slice(p+1),36);
-
-  if(
-   !Number.isFinite(dist) ||
-   !Number.isFinite(len) ||
-   dist<=0 ||
-   len<=0 ||
-   dist>out.length
-  ){
-   throw new Error("압축 참조 오류");
-  }
-
-  for(let n=0;n<len;n++){
-   out+=out[out.length-dist];
-  }
-
-  i=end+1;
- }
-
- return out;
-}
-
-/* =========================================================
-   SHA
-========================================================= */
-
-async function sha256(text){
-
- const hash=await crypto.subtle.digest(
-  "SHA-256",
-  encodeText(text)
- );
-
- return Array.from(new Uint8Array(hash))
-  .map(x=>x.toString(16).padStart(2,"0"))
-  .join("");
-}
-
-/* =========================================================
-   AES
-========================================================= */
-
-async function deriveKey(password,salt){
-
- const base=await crypto.subtle.importKey(
-  "raw",
-  encodeText(password),
-  "PBKDF2",
-  false,
-  ["deriveKey"]
- );
-
- return crypto.subtle.deriveKey(
-  {
-   name:"PBKDF2",
-   salt,
-   iterations:210000,
-   hash:"SHA-256"
-  },
-  base,
-  {
-   name:"AES-GCM",
-   length:256
-  },
-  false,
-  ["encrypt","decrypt"]
- );
-}
-
-async function encrypt(text,password){
-
- const salt=crypto.getRandomValues(
-  new Uint8Array(16)
- );
-
- const iv=crypto.getRandomValues(
-  new Uint8Array(12)
- );
-
- const key=await deriveKey(
-  password,
-  salt
- );
-
- const encrypted=
-  await crypto.subtle.encrypt(
-   {
-    name:"AES-GCM",
-    iv
-   },
-   key,
-   encodeText(text)
-  );
-
- return {
-  salt:b64(salt),
-  iv:b64(iv),
-  ciphertext:b64(
-   new Uint8Array(encrypted)
-  )
- };
-}
-
-async function decrypt(data,password){
-
- const salt=unb64(data.salt);
- const iv=unb64(data.iv);
- const cipher=unb64(data.ciphertext);
-
- const key=await deriveKey(
-  password,
-  salt
- );
-
- const plain=
-  await crypto.subtle.decrypt(
-   {
-    name:"AES-GCM",
-    iv
-   },
-   key,
-   cipher
-  );
-
- return decodeText(
-  new Uint8Array(plain)
- );
-}
-
-/* =========================================================
-   URL PACKING
-========================================================= */
-
-function pack(o){
-
- return b64(
-  encodeText(
-   JSON.stringify(o)
-  )
- );
-}
-
-function unpack(s){
-
- return JSON.parse(
-  decodeText(
-   unb64(s)
-  )
- );
-}
-
-async function saveURL(password=currentPassword){
-
- const data=clone(doc);
-
- data.updated=Date.now();
-
- if(data.encrypted){
-
-  if(!password){
-   throw new Error("암호화 비밀번호가 없습니다.");
-  }
-
-  const encrypted=
-   await encrypt(
-    data.content,
-    password
-   );
-
-  delete data.content;
-
-  data.salt=encrypted.salt;
-  data.iv=encrypted.iv;
-  data.ciphertext=encrypted.ciphertext;
-
- }else{
-
-  data.content=
-   compress(
-    data.content||""
-   );
- }
-
- const hash=
-  "#cw="+pack(data);
-
- history.replaceState(
-  null,
-  "",
-  hash
- );
-
- updateURLStats();
-
- return location.href;
-}
-
-async function loadURL(){
-
- if(!location.hash.startsWith("#cw=")){
-
-  doc=clone(DEFAULT);
-  doc.id=randomID();
-  unlocked=true;
-  currentPassword=null;
-
-  return;
- }
-
- try{
-
-  const data=
-   unpack(
-    location.hash.slice(4)
-   );
-
-  if(
-   !data ||
-   typeof data.title!=="string" ||
-   typeof data.version!=="number"
-  ){
-   throw new Error("문서 형식 오류");
-  }
-
-  if(!data.id){
-   data.id=randomID();
-  }
-
-  if(data.encrypted){
-
-   doc=data;
-
-   delete doc.content;
-
-   unlocked=false;
-   currentPassword=null;
-
-  }else{
-
-   doc=data;
-
-   doc.content=
-    decompress(
-     doc.content
-    );
-
-   unlocked=true;
-   currentPassword=null;
-  }
-
- }catch(e){
-
-  console.error(e);
-
-  alert(
-   "CommuWiki 데이터를 읽을 수 없습니다.\n"+
-   e.message
-  );
-
-  doc=clone(DEFAULT);
-  doc.id=randomID();
-  unlocked=true;
- }
-}
-
-/* =========================================================
-   MARKDOWN
-========================================================= */
-
-function slug(text,i){
-
- const clean=text
-  .replace(/<[^>]+>/g,"")
-  .replace(/[^\w가-힣 -]/g,"")
-  .trim()
-  .replace(/\s+/g,"-");
-
- return "cw-"+i+"-"+(clean||"section");
-}
-
-function inline(text){
-
- let s=escapeHTML(text);
-
- /*
-   Wiki links.
-   실제 이동은 click handler에서 처리한다.
- */
-
- s=s.replace(
-  /\[\[([^\]]+)\]\]/g,
-  '<a class="wiki-link" data-wiki="$1">[[$1]]</a>'
- );
-
- s=s.replace(
-  /!\[([^\]]*)\]\((https?:\/\/[^)\s]+)\)/g,
-  '<img src="$2" alt="$1" loading="lazy">'
- );
-
- s=s.replace(
-  /\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g,
-  '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>'
- );
-
- s=s.replace(
-  /`([^`]+)`/g,
-  "<code>$1</code>"
- );
-
- s=s.replace(
-  /\*\*([^*]+)\*\*/g,
-  "<strong>$1</strong>"
- );
-
- s=s.replace(
-  /__([^_]+)__/g,
-  "<strong>$1</strong>"
- );
-
- s=s.replace(
-  /~~([^~]+)~~/g,
-  "<del>$1</del>"
- );
-
- s=s.replace(
-  /(^|[^\*])\*([^*\n]+)\*(?!\*)/g,
-  "$1<em>$2</em>"
- );
-
- s=s.replace(
-  /(^|[^_])_([^_\n]+)_(?!_)/g,
-  "$1<em>$2</em>"
- );
-
- return s;
-}
-
-function markdown(md){
-
- const lines=
-  String(md||"")
-   .replace(/\r/g,"")
-   .split("\n");
-
- let html="";
- let code=false;
- let codeLang="";
- let codeLines=[];
-
- let list=null;
- let listItems=[];
-
- const headings=[];
-
- function closeList(){
-
-  if(!list) return;
-
-  html+="<"+list+">";
-
-  for(const item of listItems){
-   html+="<li>"+item+"</li>";
-  }
-
-  html+="</"+list+">";
-
-  list=null;
-  listItems=[];
- }
-
- function flushCode(){
-
-  html+=
-   '<pre><code class="language-'+
-   escapeHTML(codeLang)+
-   '">'+
-   escapeHTML(codeLines.join("\n"))+
-   "</code></pre>";
-
-  codeLines=[];
-  codeLang="";
- }
-
- for(let i=0;i<lines.length;i++){
-
-  const line=lines[i];
-
-  if(code){
-
-   if(/^```/.test(line)){
-    code=false;
-    flushCode();
-   }else{
-    codeLines.push(line);
-   }
-
-   continue;
-  }
-
-  const fence=line.match(/^```(.*)$/);
-
-  if(fence){
-
-   closeList();
-
-   code=true;
-   codeLang=fence[1].trim();
-
-   continue;
-  }
-
-  const heading=
-   line.match(/^(#{1,6})\s+(.+)$/);
-
-  if(heading){
-
-   closeList();
-
-   const level=heading[1].length;
-   const text=heading[2];
-   const id=slug(text,headings.length);
-
-   headings.push({
-    level,
-    text,
-    id
-   });
-
-   html+=
-    "<h"+level+
-    ' id="'+id+'">'+
-    inline(text)+
-    "</h"+level+">";
-
-   continue;
-  }
-
-  if(/^---+$/.test(line.trim())){
-
-   closeList();
-
-   html+="<hr>";
-
-   continue;
-  }
-
-  if(/^>\s?/.test(line)){
-
-   closeList();
-
-   html+=
-    "<blockquote>"+
-    inline(
-     line.replace(/^>\s?/,"")
-    )+
-    "</blockquote>";
-
-   continue;
-  }
-
-  const task=
-   line.match(
-    /^[-*+]\s+\[([ xX])\]\s+(.*)$/
-   );
-
-  if(task){
-
-   if(list!=="ul"){
-
-    closeList();
-
-    list="ul";
-    listItems=[];
-   }
-
-   listItems.push(
-    '<input type="checkbox" disabled '+
-    (
-     task[1].toLowerCase()==="x"
-     ?"checked"
-     :""
-    )+
-    "> "+
-    inline(task[2])
-   );
-
-   continue;
-  }
-
-  const ul=
-   line.match(/^[-*+]\s+(.+)$/);
-
-  if(ul){
-
-   if(list!=="ul"){
-
-    closeList();
-
-    list="ul";
-    listItems=[];
-   }
-
-   listItems.push(
-    inline(ul[1])
-   );
-
-   continue;
-  }
-
-  const ol=
-   line.match(/^\d+\.\s+(.+)$/);
-
-  if(ol){
-
-   if(list!=="ol"){
-
-    closeList();
-
-    list="ol";
-    listItems=[];
-   }
-
-   listItems.push(
-    inline(ol[1])
-   );
-
-   continue;
-  }
-
-  if(line.trim()===""){
-
-   closeList();
-
-   continue;
-  }
-
-  /*
-    Simple table parser.
-  */
-
-  if(
-   line.includes("|") &&
-   i+1<lines.length &&
-   /^\s*\|?\s*:?-+:?\s*(\|\s*:?-+:?\s*)+\|?\s*$/
-    .test(lines[i+1])
-  ){
-
-   closeList();
-
-   const split=row=>row
-    .trim()
-    .replace(/^\|/,"")
-    .replace(/\|$/,"")
-    .split("|")
-    .map(x=>x.trim());
-
-   const headers=split(line);
-
-   i++;
-
-   html+="<table><thead><tr>";
-
-   for(const h of headers){
-    html+="<th>"+inline(h)+"</th>";
-   }
-
-   html+="</tr></thead><tbody>";
-
-   while(
-    i+1<lines.length &&
-    lines[i+1].includes("|") &&
-    lines[i+1].trim()!==""
-   ){
-
-    i++;
-
-    const cells=split(lines[i]);
-
-    html+="<tr>";
-
-    for(let n=0;n<headers.length;n++){
-     html+=
-      "<td>"+
-      inline(cells[n]||"")+
-      "</td>";
+function markdownToHTML(src){
+  const lines=src.replace(/\r\n?/g,"\n").split("\n");
+  let out=[], i=0, inCode=false, code=[];
+  while(i<lines.length){
+    let l=lines[i];
+    if(l.startsWith("```")){
+      if(!inCode){inCode=true;code=[]}
+      else{out.push("<pre><code>"+escapeHtml(code.join("\n"))+"</code></pre>");inCode=false}
+      i++; continue;
     }
-
-    html+="</tr>";
-   }
-
-   html+="</tbody></table>";
-
-   continue;
-  }
-
-  closeList();
-
-  html+="<p>"+inline(line)+"</p>";
- }
-
- closeList();
-
- let toc="";
-
- if(headings.length){
-
-  toc=
-   '<div class="toc">'+
-   '<div class="toc-title">목차</div>';
-
-  for(const h of headings){
-
-   toc+=
-    '<a class="l'+h.level+
-    '" href="#'+h.id+'">'+
-    inline(h.text)+
-    "</a>";
-  }
-
-  toc+="</div>";
- }
-
- return toc+html;
-}
-
-/* =========================================================
-   RENDER
-========================================================= */
-
-function render(){
-
- $("titleStatus").textContent=
-  doc.title||"문서";
-
- $("version").textContent=
-  "v"+(doc.version||1);
-
- if(doc.encrypted && !unlocked){
-
-  $("editor").value=
-   "# 암호화된 문서\n\n"+
-   "편집 버튼을 눌러 비밀번호를 입력하세요.";
-
-  $("editor").readOnly=true;
-
-  $("viewer").innerHTML=
-   `<div style="display:grid;place-items:center;min-height:300px">
-     <div style="text-align:center">
-      <h2>암호화된 문서</h2>
-      <p style="color:var(--muted)">
-       비밀번호가 있어야 내용을 볼 수 있습니다.
-      </p>
-     </div>
-    </div>`;
-
- }else{
-
-  $("editor").value=
-   doc.content||"";
-
-  $("editor").readOnly=!editing;
-
-  $("viewer").innerHTML=
-   markdown(
-    doc.content||""
-   );
- }
-
- $("permission").innerHTML=
-  doc.permission==="password"
-  ?'<span class="lock">편집 보호</span>'
-  :'공개 편집';
-
- if(doc.encrypted){
-  $("permission").innerHTML+=
-   ' · <span class="ok">AES-256-GCM</span>';
- }
-
- $("editButton").textContent=
-  editing
-  ?"편집 종료"
-  :"편집";
-
- updateStats();
- updateURLStats();
-
- bindWikiLinks();
-}
-
-function updateStats(){
-
- const c=doc.content||"";
-
- const words=c.trim()
-  ?c.trim().split(/\s+/).length
-  :0;
-
- const lines=c
-  ?c.split("\n").length
-  :0;
-
- $("stats").textContent=
-  c.length.toLocaleString()+
-  "자 · "+
-  words.toLocaleString()+
-  "단어 · "+
-  lines+
-  "줄 · "+
-  bytes(c).toLocaleString()+
-  "B";
-}
-
-function updateURLStats(){
-
- const n=location.href.length;
-
- let size=n+"B";
-
- if(n>=1024){
-  size=(n/1024).toFixed(1)+"KB";
- }
-
- let suffix="";
-
- if(n>6000){
-  suffix=" · 큼";
- }
-
- if(n>12000){
-  suffix=" · 매우 큼";
- }
-
- $("urlStats").textContent=
-  "URL "+size+suffix;
-}
-
-/* =========================================================
-   WIKI LINKS
-========================================================= */
-
-function bindWikiLinks(){
-
- document
-  .querySelectorAll(".wiki-link")
-  .forEach(a=>{
-
-   a.addEventListener(
-    "click",
-    ()=>{
-     openWikiDocument(
-      a.dataset.wiki
-     );
+    if(inCode){code.push(l);i++;continue}
+    if(/^#{1,6}\s+/.test(l)){
+      const m=l.match(/^(#{1,6})\s+(.*)$/);
+      const n=m[1].length;
+      out.push("<h"+n+">"+inlineMD(m[2])+"</h"+n+">");i++;continue;
     }
-   );
-  });
+    if(/^>\s?/.test(l)){
+      let a=[]; while(i<lines.length && /^>\s?/.test(lines[i])){a.push(lines[i].replace(/^>\s?/,""));i++}
+      out.push("<blockquote>"+a.map(inlineMD).join("<br>")+"</blockquote>");continue;
+    }
+    if(/^\s*([-*_])(?:\s*\1){2,}\s*$/.test(l)){out.push("<hr>");i++;continue}
+    if(/^\s*[-*+]\s+/.test(l)){
+      let a=[];while(i<lines.length&&/^\s*[-*+]\s+/.test(lines[i])){a.push(lines[i].replace(/^\s*[-*+]\s+/,""));i++}
+      out.push("<ul>"+a.map(x=>"<li>"+inlineMD(x.replace(/^\[( |x|X)\]\s*/,""))+"</li>").join("")+"</ul>");continue;
+    }
+    if(/^\s*\d+\.\s+/.test(l)){
+      let a=[];while(i<lines.length&&/^\s*\d+\.\s+/.test(lines[i])){a.push(lines[i].replace(/^\s*\d+\.\s+/,""));i++}
+      out.push("<ol>"+a.map(x=>"<li>"+inlineMD(x)+"</li>").join("")+"</ol>");continue;
+    }
+    if(l.includes("|") && i+1<lines.length && /^\s*\|?\s*:?-{3,}/.test(lines[i+1])){
+      const split=x=>x.trim().replace(/^\|/,"").replace(/\|$/,"").split("|").map(y=>y.trim());
+      const heads=split(l), rows=[];i+=2;
+      while(i<lines.length&&lines[i].includes("|")){rows.push(split(lines[i]));i++}
+      out.push("<table><thead><tr>"+heads.map(x=>"<th>"+inlineMD(x)+"</th>").join("")+"</tr></thead><tbody>"+
+        rows.map(r=>"<tr>"+heads.map((_,j)=>"<td>"+inlineMD(r[j]||"")+"</td>").join("")+"</tr>").join("")+"</tbody></table>");continue;
+    }
+    if(l.trim()===""){i++;continue}
+    let p=[l];i++;
+    while(i<lines.length && lines[i].trim()!=="" && !/^(#{1,6})\s+|^>\s?|^\s*[-*+]\s+|^\s*\d+\.\s+|^```/.test(lines[i])){
+      p.push(lines[i]);i++;
+    }
+    out.push("<p>"+p.map(inlineMD).join("<br>")+"</p>");
+  }
+  if(inCode) out.push("<pre><code>"+escapeHtml(code.join("\n"))+"</code></pre>");
+  return out.join("\n");
 }
 
-function openWikiDocument(name){
-
- const library=getLibrary();
-
- const found=library.find(
-  x=>
-   x.title.toLowerCase()===
-   name.toLowerCase()
- );
-
- if(!found){
-
-  alert(
-   "문서 라이브러리에서 \""+
-   name+
-   "\" 문서를 찾지 못했습니다."
-  );
-
-  return;
- }
-
- doc=clone(found);
-
- unlocked=
-  !doc.encrypted;
-
- currentPassword=null;
- editing=false;
-
- render();
+function updateStatus(){
+  $("counts").textContent = editor.value.length+" chars • "+editor.value.split(/\n/).length+" lines";
+  $("state").textContent = dirty ? "Modified" : "Saved";
+  $("state").className = dirty ? "bad" : "ok";
 }
-
-/* =========================================================
-   EDIT
-========================================================= */
-
-function requestEdit(){
-
- if(editing){
-
-  editing=false;
-  render();
-
-  return;
- }
-
- if(doc.permission==="public"){
-
-  unlocked=true;
-  editing=true;
-
-  undoStack=[
-   doc.content||""
-  ];
-
+function setMode(m){
+  mode=m;
+  $("editor").style.display=m==="code"?"block":"none";
+  $("preview").style.display=m==="preview"?"block":"none";
+  $("diff").style.display=m==="diff"?"block":"none";
+  [$("codeTab"),$("previewTab"),$("diffTab")].forEach(x=>x.classList.remove("active"));
+  $(m+"Tab").classList.add("active");
+  if(m==="preview") $("preview").innerHTML=markdownToHTML(editor.value);
+  if(m==="diff") renderDiff();
+}
+function pushUndo(){
+  const s={title:title.value,content:editor.value};
+  const prev=undoStack[undoStack.length-1];
+  if(!prev || prev.content!==s.content || prev.title!==s.title) undoStack.push(s);
+  if(undoStack.length>100) undoStack.shift();
   redoStack=[];
-
-  render();
-
-  $("editor").focus();
-
-  return;
- }
-
- $("passwordInput").value="";
-
- $("passwordMessage").textContent=
-  doc.encrypted
-  ?"비밀번호가 맞으면 문서를 복호화합니다."
-  :"편집 비밀번호를 입력하세요.";
-
- openModal("passwordModal");
-
- setTimeout(
-  ()=>$("passwordInput").focus(),
-  50
- );
 }
-
-async function submitPassword(){
-
- const password=
-  $("passwordInput").value;
-
- if(!password){
-  alert("비밀번호를 입력하세요.");
-  return;
- }
-
- if(doc.encrypted){
-
-  try{
-
-   const content=
-    await decrypt(
-     doc,
-     password
-    );
-
-   doc.content=content;
-
-   unlocked=true;
-   currentPassword=password;
-   editing=true;
-
-   undoStack=[content];
-   redoStack=[];
-
-   closeModal("passwordModal");
-
-   render();
-
-   $("editor").focus();
-
-  }catch(e){
-
-   alert("비밀번호가 올바르지 않습니다.");
-  }
-
-  return;
- }
-
- const hash=
-  await sha256(password);
-
- if(hash!==doc.passwordHash){
-
-  alert("비밀번호가 올바르지 않습니다.");
-  return;
- }
-
- unlocked=true;
- currentPassword=password;
- editing=true;
-
- undoStack=[
-  doc.content||""
- ];
-
- redoStack=[];
-
- closeModal("passwordModal");
-
- render();
-
- $("editor").focus();
+function restoreState(s){
+  title.value=s.title;editor.value=s.content;dirty=true;updateStatus();
 }
-
-/* =========================================================
-   EDITOR
-========================================================= */
-
-function editorChanged(){
-
- if(!editing) return;
-
- const value=
-  $("editor").value;
-
- doc.content=value;
-
- doc.version++;
-
- doc.updated=Date.now();
-
- undoStack.push(value);
-
- if(undoStack.length>100){
-  undoStack.shift();
- }
-
- redoStack=[];
-
- $("viewer").innerHTML=
-  markdown(value);
-
- updateStats();
-
- $("saveStatus").textContent=
-  "변경됨";
-
- clearTimeout(saveTimer);
-
- saveTimer=setTimeout(
-  autosave,
-  600
- );
-}
-
-async function autosave(){
-
- try{
-
-  localStorage.setItem(
-   STORAGE_DRAFT,
-   JSON.stringify({
-    ...doc,
-    content:doc.content,
-    savedAt:Date.now()
-   })
-  );
-
-  if(!doc.encrypted){
-
-   await saveURL();
-
-   $("saveStatus").textContent=
-    "자동 저장됨";
-  }else if(currentPassword){
-
-   await saveURL(
-    currentPassword
-   );
-
-   $("saveStatus").textContent=
-    "암호화 저장됨";
-  }else{
-
-   $("saveStatus").textContent=
-    "암호화 · 세션 저장";
-  }
-
- }catch(e){
-
-  console.error(e);
-
-  $("saveStatus").textContent=
-   "저장 오류";
- }
-}
-
-function editorKeydown(e){
-
- if(e.key==="Tab"){
-
-  e.preventDefault();
-
-  const el=$("editor");
-
-  el.setRangeText(
-   "    ",
-   el.selectionStart,
-   el.selectionEnd,
-   "end"
-  );
-
-  editorChanged();
-
-  return;
- }
-
- if(
-  (e.ctrlKey||e.metaKey) &&
-  e.key.toLowerCase()==="s"
- ){
-
-  e.preventDefault();
-
-  autosave();
-
-  return;
- }
-
- if(
-  (e.ctrlKey||e.metaKey) &&
-  e.key.toLowerCase()==="z"
- ){
-
-  e.preventDefault();
-
-  if(e.shiftKey){
-   redo();
-  }else{
-   undo();
-  }
-
-  return;
- }
-
- if(
-  (e.ctrlKey||e.metaKey) &&
-  e.key.toLowerCase()==="y"
- ){
-
-  e.preventDefault();
-
-  redo();
- }
-}
-
 function undo(){
-
- if(undoStack.length<2) return;
-
- const current=
-  undoStack.pop();
-
- redoStack.push(current);
-
- const previous=
-  undoStack[
-   undoStack.length-1
-  ];
-
- $("editor").value=previous;
- doc.content=previous;
-
- renderPreview();
-
+  if(undoStack.length<2)return;
+  const now=undoStack.pop();redoStack.push(now);
+  restoreState(undoStack[undoStack.length-1]);
 }
-
 function redo(){
-
- if(!redoStack.length) return;
-
- const value=
-  redoStack.pop();
-
- undoStack.push(value);
-
- $("editor").value=value;
- doc.content=value;
-
- renderPreview();
+  if(!redoStack.length)return;
+  const s=redoStack.pop();undoStack.push(s);restoreState(s);
 }
-
-function renderPreview(){
-
- $("viewer").innerHTML=
-  markdown(
-   $("editor").value
-  );
-
- updateStats();
- bindWikiLinks();
+function getHistory(){return readJSON(HISTORY_KEY,[])}
+function setHistory(h){writeJSON(HISTORY_KEY,h.slice(-MAX_HISTORY))}
+function snapshotObject(source="manual"){
+  return {id:uid(),title:title.value.trim()||"Untitled Snapshot",content:editor.value,
+    created:Date.now(),source};
 }
-
-/* =========================================================
-   TOOLBAR
-========================================================= */
-
-function insertSyntax(text){
-
- if(!editing){
-  requestEdit();
-  return;
- }
-
- const el=$("editor");
-
- const start=el.selectionStart;
- const end=el.selectionEnd;
-
- const selected=
-  el.value.slice(start,end);
-
- let value=text;
-
- if(selected){
-
-  if(text==="**text**"){
-   value="**"+selected+"**";
-  }
-
-  if(text==="*text*"){
-   value="*"+selected+"*";
-  }
-
-  if(text==="`code`"){
-   value="`"+selected+"`";
-  }
- }
-
- el.setRangeText(
-  value,
-  start,
-  end,
-  "end"
- );
-
- editorChanged();
-
- el.focus();
+function sameSnapshot(a,b){return a && b && a.title===b.title && a.content===b.content}
+function saveSnapshot(source="manual"){
+  const snap=snapshotObject(source);
+  let h=getHistory();
+  if(!sameSnapshot(h[h.length-1],snap)) h.push(snap);
+  setHistory(h);
+  currentSnapshot=snap;
+  dirty=false;
+  saveDraft();
+  renderHistory();
+  updateStatus();
 }
-
-/* =========================================================
-   NEW DOCUMENT
-========================================================= */
-
-function permissionChanged(){
-
- const type=
-  document.querySelector(
-   'input[name="newPermission"]:checked'
-  ).value;
-
- $("passwordSettings").style.display=
-  type==="password"
-  ?"block"
-  :"none";
+function saveDraft(){
+  writeJSON(DRAFT_KEY,{title:title.value,content:editor.value,updated:Date.now()});
 }
-
-function newDocument(){
-
- $("newTitle").value="";
- $("newContent").value=
-  "# 새로운 문서\n\n내용을 입력하세요.";
-
- $("newPassword").value="";
- $("newEncrypt").checked=false;
-
- document.querySelector(
-  'input[name="newPermission"][value="public"]'
- ).checked=true;
-
- permissionChanged();
-
- openModal("newModal");
+function loadSnapshot(s){
+  title.value=s.title;editor.value=s.content;
+  currentSnapshot=s;dirty=false;
+  undoStack=[{title:s.title,content:s.content}];redoStack=[];
+  saveDraft();setMode("code");updateStatus();
 }
-
-async function createDocument(){
-
- const title=
-  $("newTitle").value.trim()||
-  "새 문서";
-
- const content=
-  $("newContent").value;
-
- const permission=
-  document.querySelector(
-   'input[name="newPermission"]:checked'
-  ).value;
-
- const password=
-  $("newPassword").value;
-
- const encrypted=
-  permission==="password" &&
-  $("newEncrypt").checked;
-
- if(
-  permission==="password" &&
-  !password
- ){
-
-  alert("비밀번호를 입력하세요.");
-  return;
- }
-
- doc={
-  id:randomID(),
-  title,
-  content,
-  permission,
-  passwordHash:
-   password
-   ?await sha256(password)
-   :"",
-  encrypted,
-  salt:"",
-  iv:"",
-  ciphertext:"",
-  version:1,
-  updated:Date.now()
- };
-
- unlocked=true;
- editing=false;
-
- currentPassword=
-  encrypted
-  ?password
-  :null;
-
- closeModal("newModal");
-
- try{
-
-  await saveURL(
-   encrypted
-   ?password
-   :null
-  );
-
- }catch(e){
-
-  alert(e.message);
- }
-
- saveHistory();
-
- render();
-}
-
-/* =========================================================
-   LIBRARY
-========================================================= */
-
-function getLibrary(){
-
- try{
-
-  const x=
-   JSON.parse(
-    localStorage.getItem(
-     STORAGE_LIBRARY
-    )||"[]"
-   );
-
-  return Array.isArray(x)
-   ?x
-   :[];
-
- }catch{
-  return [];
- }
-}
-
-function saveLibraryData(data){
-
- localStorage.setItem(
-  STORAGE_LIBRARY,
-  JSON.stringify(data)
- );
-}
-
-function saveToLibrary(){
-
- if(doc.encrypted && !unlocked){
-
-  alert(
-   "암호화 문서는 먼저 잠금 해제하세요."
-  );
-
-  return;
- }
-
- const library=getLibrary();
-
- const copy=clone(doc);
-
- /*
-   암호화 문서의 현재 평문은
-   브라우저 라이브러리에 평문으로 저장하지 않는다.
- */
-
- if(copy.encrypted){
-
-  if(!currentPassword){
-
-   alert(
-    "암호화 문서의 저장 비밀번호가 없습니다."
-   );
-
-   return;
-  }
-
-  delete copy.content;
- }
-
- const index=
-  library.findIndex(
-   x=>x.id===copy.id
-  );
-
- if(index>=0){
-  library[index]=copy;
- }else{
-  library.unshift(copy);
- }
-
- saveLibraryData(library);
-
- renderLibrary();
-
- alert("문서를 라이브러리에 저장했습니다.");
-}
-
-function renderLibrary(){
-
- const library=getLibrary();
-
- const root=$("library");
-
- root.innerHTML="";
-
- if(!library.length){
-
-  root.innerHTML=
-   '<div style="padding:8px;color:var(--muted);font-size:12px">'+
-   "저장된 문서가 없습니다."+
-   "</div>";
-
-  return;
- }
-
- for(const item of library){
-
-  const el=
-   document.createElement("div");
-
-  el.className=
-   "library-item"+
-   (
-    item.id===doc.id
-    ?" active"
-    :""
-   );
-
-  el.innerHTML=
-   '<span>'+
-   (item.encrypted?"":"")+
-   "</span>"+
-   '<span class="name">'+
-   escapeHTML(item.title)+
-   "</span>";
-
-  el.onclick=()=>{
-   loadLibraryItem(item.id);
-  };
-
-  root.appendChild(el);
- }
-}
-
-async function loadLibraryItem(id){
-
- const library=getLibrary();
-
- const found=
-  library.find(
-   x=>x.id===id
-  );
-
- if(!found) return;
-
- if(found.encrypted){
-
-  /*
-    암호화 라이브러리 항목은
-    ciphertext만 있으므로 비밀번호를 받아 복호화한다.
-  */
-
-  const password=
-   prompt(
-    "암호화 문서 비밀번호:"
-   );
-
-  if(!password) return;
-
-  try{
-
-   const content=
-    await decrypt(
-     found,
-     password
-    );
-
-   doc=clone(found);
-   doc.content=content;
-
-   unlocked=true;
-   currentPassword=password;
-   editing=false;
-
-  }catch{
-
-   alert("비밀번호가 올바르지 않습니다.");
-   return;
-  }
-
- }else{
-
-  doc=clone(found);
-
-  unlocked=true;
-  currentPassword=null;
-  editing=false;
-
-  /*
-    라이브러리 데이터는 압축되지 않은
-    일반 문서 객체로 저장한다.
-  */
- }
-
- render();
-}
-
-/* =========================================================
-   HISTORY
-========================================================= */
-
-function getHistory(){
-
- try{
-
-  const all=
-   JSON.parse(
-    localStorage.getItem(
-     STORAGE_HISTORY
-    )||"{}"
-   );
-
-  return all;
-
- }catch{
-  return {};
- }
-}
-
-function saveHistory(){
-
- if(!doc.id) return;
-
- if(doc.encrypted && !unlocked){
-  return;
- }
-
- const all=getHistory();
-
- if(!all[doc.id]){
-  all[doc.id]=[];
- }
-
- all[doc.id].unshift({
-  title:doc.title,
-  content:doc.content,
-  version:doc.version,
-  time:Date.now()
- });
-
- all[doc.id]=
-  all[doc.id].slice(0,30);
-
- localStorage.setItem(
-  STORAGE_HISTORY,
-  JSON.stringify(all)
- );
-}
-
-function openHistory(){
-
- if(doc.encrypted && !unlocked){
-
-  alert(
-   "먼저 문서를 잠금 해제하세요."
-  );
-
-  return;
- }
-
- const all=getHistory();
-
- const list=
-  all[doc.id]||[];
-
- const root=$("historyList");
-
- root.innerHTML="";
-
- if(!list.length){
-
-  root.innerHTML=
-   '<div style="padding:15px;color:var(--muted)">'+
-   "이 문서의 기록이 없습니다."+
-   "</div>";
-
- }else{
-
-  list.forEach((h,i)=>{
-
-   const el=
-    document.createElement("div");
-
-   el.className="history-item";
-
-   const date=
-    new Date(h.time)
-     .toLocaleString();
-
-   el.innerHTML=
-    '<div class="info">'+
-    '<strong>v'+
-    h.version+
-    "</strong>"+
-    "<small>"+
-    escapeHTML(date)+
-    "</small>"+
-    "</div>";
-
-   const button=
-    document.createElement("button");
-
-   button.className="small";
-   button.textContent="복원";
-
-   button.onclick=()=>{
-    restoreHistory(h);
-   };
-
-   el.appendChild(button);
-
-   root.appendChild(el);
+function renderHistory(){
+  const box=$("history");box.innerHTML="";
+  const h=getHistory().slice().reverse();
+  if(!h.length){box.innerHTML='<div class="small" style="padding:10px">No snapshots yet.</div>';return}
+  h.forEach(s=>{
+    const d=document.createElement("div");d.className="hist";
+    d.innerHTML='<div class="histTitle"></div><div class="histMeta"></div>';
+    d.querySelector(".histTitle").textContent=s.title;
+    d.querySelector(".histMeta").textContent=new Date(s.created).toLocaleString()+" • "+s.source;
+    d.onclick=()=>loadSnapshot(s);
+    box.appendChild(d);
   });
- }
-
- openModal("historyModal");
 }
-
-function restoreHistory(h){
-
- if(
-  !confirm(
-   "v"+h.version+
-   "으로 복원하시겠습니까?"
-  )
- ){
-  return;
- }
-
- doc.content=h.content;
- doc.version++;
-
- editing=false;
-
- closeModal("historyModal");
-
- saveHistory();
-
- saveURL(
-  doc.encrypted
-  ?currentPassword
-  :null
- ).then(render);
+function getDocs(){return readJSON(DOCS_KEY,[])}
+function renderDocs(){
+  const box=$("docs");box.innerHTML="";
+  const docs=getDocs().slice().reverse();
+  if(!docs.length){box.innerHTML='<div class="small" style="padding:10px">No local documents.</div>';return}
+  docs.forEach(s=>{
+    const d=document.createElement("div");d.className="doc";
+    d.textContent=s.title;
+    d.onclick=()=>loadSnapshot(s);
+    box.appendChild(d);
+  });
 }
+function saveLocalDoc(){
+  let docs=getDocs();
+  const obj=snapshotObject("local");
+  const old=docs.findIndex(x=>x.id===stateLocalId);
+  if(old>=0) docs[old]=obj; else docs.push(obj);
+  stateLocalId=obj.id;
+  writeJSON(DOCS_KEY,docs.slice(-MAX_DOCS));renderDocs();
+  saveSnapshot("local");
+}
+let stateLocalId=null;
 
-/* =========================================================
-   SEARCH
-========================================================= */
+function bytesToB64(bytes){
+  let bin="";const chunk=0x8000;
+  for(let i=0;i<bytes.length;i+=chunk)bin+=String.fromCharCode(...bytes.subarray(i,i+chunk));
+  return btoa(bin);
+}
+function b64ToBytes(s){
+  const bin=atob(s);const a=new Uint8Array(bin.length);
+  for(let i=0;i<bin.length;i++)a[i]=bin.charCodeAt(i);return a;
+}
+function b64url(s){return s.replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"")}
+function fromB64url(s){s=s.replace(/-/g,"+").replace(/_/g,"/");while(s.length%4)s+="=";return s}
+function utf8b64(s){return b64url(bytesToB64(new TextEncoder().encode(s)))}
+function b64utf8(s){return new TextDecoder().decode(b64ToBytes(fromB64url(s)))}
 
-function searchDocument(){
-
- const q=
-  $("searchInput").value.trim();
-
- if(!q){
-
-  renderPreview();
-
-  return;
- }
-
- if(doc.encrypted && !unlocked){
-
-  return;
- }
-
- let html=
-  markdown(
-   doc.content||""
-  );
-
- const escaped=
-  q.replace(
-   /[.*+?^${}()|[\]\\]/g,
-   "\\$&"
-  );
-
- const re=
-  new RegExp(
-   "("+escaped+")",
-   "gi"
-  );
-
- /*
-   HTML 내부 태그를 건드리지 않기 위해
-   텍스트 영역만 처리.
- */
-
- const container=
-  document.createElement("div");
-
- container.innerHTML=html;
-
- const walker=
-  document.createTreeWalker(
-   container,
-   NodeFilter.SHOW_TEXT
-  );
-
- const nodes=[];
-
- while(walker.nextNode()){
-  nodes.push(walker.currentNode);
- }
-
- let count=0;
-
- for(const node of nodes){
-
-  if(
-   node.parentElement &&
-   (
-    node.parentElement.closest("code") ||
-    node.parentElement.closest("pre")
-   )
-  ){
-   continue;
+async function compressString(s){
+  if("CompressionStream" in window){
+    const cs=new CompressionStream("deflate-raw"),w=cs.writable.getWriter();
+    w.write(new TextEncoder().encode(s));w.close();
+    const buf=await new Response(cs.readable).arrayBuffer();
+    return "z"+b64url(bytesToB64(new Uint8Array(buf)));
   }
-
-  if(!re.test(node.nodeValue)){
-   re.lastIndex=0;
-   continue;
-  }
-
-  re.lastIndex=0;
-
-  const fragment=
-   document.createDocumentFragment();
-
-  let last=0;
-
-  node.nodeValue.replace(
-   re,
-   (match,_,offset)=>{
-
-    fragment.appendChild(
-     document.createTextNode(
-      node.nodeValue.slice(
-       last,
-       offset
-      )
-     )
-    );
-
-    const mark=
-     document.createElement("mark");
-
-    mark.style.background=
-     "#facc15";
-
-    mark.style.color="#111";
-
-    mark.textContent=match;
-
-    fragment.appendChild(mark);
-
-    last=offset+match.length;
-
-    count++;
-
-    return match;
-   }
-  );
-
-  fragment.appendChild(
-   document.createTextNode(
-    node.nodeValue.slice(last)
-   )
-  );
-
-  node.parentNode.replaceChild(
-   fragment,
-   node
-  );
-
-  re.lastIndex=0;
- }
-
- $("viewer").innerHTML="";
- $("viewer").appendChild(container);
-
- $("saveStatus").textContent=
-  count+
-  "개 검색됨";
-
- bindWikiLinks();
+  return "t"+utf8b64(s);
 }
-
-function clearSearch(){
-
- $("searchInput").value="";
-
- render();
-
-}
-
-/* =========================================================
-   SHARE
-========================================================= */
-
-async function shareDocument(){
-
- if(doc.encrypted && !unlocked){
-
-  alert(
-   "먼저 문서를 잠금 해제하세요."
-  );
-
-  return;
- }
-
- let url;
-
- try{
-
-  if(doc.encrypted){
-
-   if(!currentPassword){
-
-    currentPassword=
-     prompt(
-      "암호화 문서 비밀번호:"
-     );
-
-    if(!currentPassword) return;
-   }
-
-   url=
-    await saveURL(
-     currentPassword
-    );
-
-  }else{
-
-   url=
-    await saveURL();
+async function decompressString(token){
+  if(token.startsWith("t"))return b64utf8(token.slice(1));
+  if(token.startsWith("z") && "DecompressionStream" in window){
+    const raw=b64ToBytes(fromB64url(token.slice(1)));
+    const ds=new DecompressionStream("deflate-raw"),w=ds.writable.getWriter();
+    w.write(raw);w.close();
+    return new TextDecoder().decode(await new Response(ds.readable).arrayBuffer());
   }
-
- }catch(e){
-
-  alert(
-   "공유 주소 생성 실패:\n"+
-   e.message
-  );
-
-  return;
- }
-
- if(
-  navigator.share
- ){
-
+  throw new Error("This browser cannot decompress this snapshot.");
+}
+function basePath(){
+  const u=new URL(location.href);u.hash="";u.search="";return u.href;
+}
+async function makeShare(){
+  const payload={v:4,t:title.value||"Untitled Snapshot",c:editor.value,created:Date.now()};
+  const token=await compressString(JSON.stringify(payload));
+  return basePath()+"#cw="+token;
+}
+async function importURL(){
+  if(!location.hash.startsWith("#cw="))return false;
   try{
-
-   await navigator.share({
-    title:doc.title,
-    text:"CommuWiki 문서",
-    url
-   });
-
-   return;
-
-  }catch{}
- }
-
- $("shareURL").value=url;
-
- openModal("shareModal");
+    const raw=await decompressString(location.hash.slice(4));
+    const p=JSON.parse(raw);
+    if(!p || p.v!==4)throw new Error("Unsupported snapshot version");
+    title.value=p.t||"Untitled Snapshot";editor.value=p.c||"";
+    const imported={id:uid(),title:title.value,content:editor.value,created:p.created||Date.now(),source:"shared URL"};
+    currentSnapshot=imported;dirty=false;
+    let h=getHistory();if(!sameSnapshot(h[h.length-1],imported))h.push(imported);setHistory(h);
+    undoStack=[{title:title.value,content:editor.value}];redoStack=[];
+    saveDraft();renderHistory();setMode("code");updateStatus();
+    return true;
+  }catch(e){alert("공유 스냅샷을 열 수 없습니다.\n"+e.message);return false}
 }
-
-async function copyShareURL(){
-
- const url=
-  $("shareURL").value;
-
- try{
-
-  await navigator.clipboard.writeText(
-   url
-  );
-
- }catch{
-
-  $("shareURL").select();
-
-  document.execCommand(
-   "copy"
-  );
- }
-
- alert("공유 주소를 복사했습니다.");
+async function share(){
+  saveSnapshot("shared");
+  const url=await makeShare();
+  if(url.length>12000) alert("URL이 매우 깁니다. Markdown 내용을 줄이면 더 안정적으로 공유할 수 있습니다.");
+  showModal("Share Snapshot",
+    '<div class="small">이 링크 자체가 스냅샷입니다. 서버나 DB 없이 URL에 내용이 들어갑니다.</div><textarea id="shareText" readonly></textarea>',
+    [{text:"Copy",fn:async()=>{await navigator.clipboard.writeText(url);alert("공유 링크를 복사했습니다.");}},{text:"Open",fn:()=>location.href=url},{text:"Close"}]);
+  $("shareText").value=url;
 }
-
-/* =========================================================
-   EXPORT
-========================================================= */
-
-function download(name,data,type){
-
- const blob=
-  new Blob(
-   [data],
-   {type}
-  );
-
- const a=
-  document.createElement("a");
-
- a.href=
-  URL.createObjectURL(blob);
-
- a.download=name;
-
- document.body.appendChild(a);
-
- a.click();
-
- a.remove();
-
- setTimeout(
-  ()=>URL.revokeObjectURL(a.href),
-  1000
- );
+function diffLines(a,b){
+  const A=a.replace(/\r\n?/g,"\n").split("\n"),B=b.replace(/\r\n?/g,"\n").split("\n");
+  const n=A.length,m=B.length,dp=Array.from({length:n+1},()=>new Uint32Array(m+1));
+  for(let i=n-1;i>=0;i--)for(let j=m-1;j>=0;j--)dp[i][j]=A[i]===B[j]?dp[i+1][j+1]+1:Math.max(dp[i+1][j],dp[i][j+1]);
+  let i=0,j=0,out=[];
+  while(i<n&&j<m){
+    if(A[i]===B[j]){out.push("  "+A[i]);i++;j++}
+    else if(dp[i+1][j]>=dp[i][j+1]){out.push("- "+A[i]);i++}
+    else{out.push("+ "+B[j]);j++}
+  }
+  while(i<n)out.push("- "+A[i++]);
+  while(j<m)out.push("+ "+B[j++]);
+  return out.join("\n");
 }
-
+function renderDiff(){
+  const h=getHistory();const base=currentSnapshot||h[h.length-1];
+  $("diff").textContent=base ? diffLines(base.content,editor.value) : editor.value;
+}
+function showModal(t,body,buttons){
+  $("modalTitle").textContent=t;$("modalBody").innerHTML=body;
+  const f=$("modalFoot");f.innerHTML="";
+  buttons.forEach(b=>{const x=document.createElement("button");x.textContent=b.text;x.onclick=()=>{if(b.fn)b.fn();$("modalBack").style.display="none"};f.appendChild(x)});
+  $("modalBack").style.display="flex";
+}
+function newSnapshot(){
+  if(dirty && !confirm("저장하지 않은 변경사항이 있습니다. 새 스냅샷을 만들까요?"))return;
+  title.value="Untitled Snapshot";editor.value="# New Snapshot\n\n";
+  currentSnapshot=null;dirty=true;undoStack=[{title:title.value,content:editor.value}];redoStack=[];
+  setMode("code");updateStatus();
+}
+function importMarkdown(){
+  showModal("Import Markdown",'<textarea id="importText" placeholder="Paste Markdown here"></textarea>',
+    [{text:"Import",fn:()=>{editor.value=$("importText").value;dirty=true;pushUndo();setMode("code");updateStatus();}},{text:"Cancel"}]);
+}
 function exportMarkdown(){
-
- if(doc.encrypted && !unlocked){
-
-  alert(
-   "먼저 잠금 해제하세요."
-  );
-
-  return;
- }
-
- download(
-  (doc.title||"document")+".md",
-  doc.content||"",
-  "text/markdown;charset=utf-8"
- );
+  const blob=new Blob([editor.value],{type:"text/markdown;charset=utf-8"});
+  const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=(title.value.trim()||"snapshot")+".md";a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href),1000);
 }
-
-function exportJSON(){
-
- if(doc.encrypted && !unlocked){
-
-  alert(
-   "먼저 잠금 해제하세요."
-  );
-
-  return;
- }
-
- const data=clone(doc);
-
- /*
-   암호화 문서는 ciphertext를 포함한
-   백업을 만들 수 있다.
- */
-
- download(
-  (doc.title||"document")+
-   ".commuwiki.json",
-  JSON.stringify(
-   data,
-   null,
-   2
-  ),
-  "application/json;charset=utf-8"
- );
+function printPreview(){
+  const w=window.open("","_blank");
+  if(!w)return;
+  w.document.write("<!doctype html><html><head><title>"+escapeHtml(title.value)+"</title><style>body{font-family:Segoe UI,sans-serif;max-width:900px;margin:40px auto;line-height:1.6}pre{background:#eee;padding:12px}code{font-family:Consolas}</style></head><body><h1>"+escapeHtml(title.value)+"</h1>"+markdownToHTML(editor.value)+"</body></html>");
+  w.document.close();w.focus();w.print();
 }
+document.querySelectorAll(".menuItem").forEach(x=>x.onclick=()=>{
+  const m=x.dataset.menu;
+  if(m==="file")showModal("File","",[{text:"Import Markdown",fn:importMarkdown},{text:"Export Markdown",fn:exportMarkdown},{text:"Print / PDF",fn:printPreview},{text:"Cancel"}]);
+  if(m==="edit")showModal("Edit","",[{text:"Undo",fn:undo},{text:"Redo",fn:redo},{text:"Cancel"}]);
+  if(m==="view")showModal("View","",[{text:"Code",fn:()=>setMode("code")},{text:"Preview",fn:()=>setMode("preview")},{text:"Diff",fn:()=>setMode("diff")},{text:"Cancel"}]);
+  if(m==="tools")showModal("Tools","<div>CommuWiki is a static snapshot wiki. Browser history is stored locally in this browser.</div>",
+    [{text:"Clear Local History",fn:()=>{if(confirm("이 브라우저의 스냅샷 기록을 모두 삭제할까요?")){localStorage.removeItem(HISTORY_KEY);localStorage.removeItem(DOCS_KEY);renderHistory();renderDocs();}}},{text:"Cancel"}]);
+});
+$("saveBtn").onclick=()=>saveSnapshot("manual");
+$("previewBtn").onclick=()=>setMode("preview");
+$("codeBtn").onclick=()=>setMode("code");
+$("diffBtn").onclick=()=>setMode("diff");
+$("shareBtn").onclick=share;
+$("newBtn").onclick=newSnapshot;
+$("codeTab").onclick=()=>setMode("code");
+$("previewTab").onclick=()=>setMode("preview");
+$("diffTab").onclick=()=>setMode("diff");
 
-function importJSONDialog(){
+editor.addEventListener("input",()=>{
+  dirty=true;
+  const cur={title:title.value,content:editor.value};
+  const last=undoStack[undoStack.length-1];
+  if(!last || last.content!==cur.content || last.title!==cur.title)undoStack.push(cur);
+  if(undoStack.length>100)undoStack.shift();
+  redoStack=[];
+  saveDraft();updateStatus();
+});
+title.addEventListener("input",()=>{
+  dirty=true;
+  const cur={title:title.value,content:editor.value};
+  const last=undoStack[undoStack.length-1];
+  if(!last || last.content!==cur.content || last.title!==cur.title)undoStack.push(cur);
+  saveDraft();updateStatus();
+});
+document.addEventListener("keydown",e=>{
+  if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==="s"){e.preventDefault();saveSnapshot("manual")}
+  if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==="z"){e.preventDefault();undo()}
+  if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==="y"){e.preventDefault();redo()}
+  if((e.ctrlKey||e.metaKey)&&e.key==="Enter"){e.preventDefault();setMode("preview")}
+});
+window.addEventListener("beforeunload",e=>{if(dirty){e.preventDefault();e.returnValue=""}});
 
- $("jsonInput").value="";
-
- openModal("jsonModal");
-}
-
-function restoreJSON(){
-
- try{
-
-  const data=
-   JSON.parse(
-    $("jsonInput").value
-   );
-
-  if(
-   !data ||
-   typeof data.title!=="string" ||
-   typeof data.version!=="number"
-  ){
-   throw new Error(
-    "CommuWiki JSON 형식이 아닙니다."
-   );
+(async function init(){
+  const shared=await importURL();
+  if(!shared){
+    const draft=readJSON(DRAFT_KEY,null);
+    const h=getHistory();
+    if(draft && !h.length){title.value=draft.title||"Untitled Snapshot";editor.value=draft.content||""}
+    else if(h.length)loadSnapshot(h[h.length-1]);
+    else{
+      title.value="Untitled Snapshot";editor.value="# Welcome to CommuWiki\n\nWrite Markdown here.\n";
+      undoStack=[{title:title.value,content:editor.value}];
+      saveSnapshot("initial");
+    }
   }
-
-  if(!data.id){
-   data.id=randomID();
-  }
-
-  if(data.encrypted){
-
-   delete data.content;
-
-   unlocked=false;
-   currentPassword=null;
-
-  }else{
-
-   if(
-    typeof data.content!=="string"
-   ){
-    throw new Error(
-     "본문이 없습니다."
-    );
-   }
-
-   unlocked=true;
-  }
-
-  doc=data;
-  editing=false;
-
-  closeModal("jsonModal");
-
-  render();
-
- }catch(e){
-
-  alert(
-   "복원 실패:\n"+
-   e.message
-  );
- }
-
-/* =========================================================
-   PRINT
-========================================================= */
-
-function printDocument(){
-
- if(doc.encrypted && !unlocked){
-
-  alert("먼저 잠금 해제하세요.");
-
-  return;
- }
-
- const w=
-  window.open(
-   "",
-   "_blank"
-  );
-
- if(!w){
-
-  alert(
-   "팝업이 차단되었습니다."
-  );
-
-  return;
- }
-
- w.document.write(`
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="utf-8">
-<title>${escapeHTML(doc.title)}</title>
-<style>
-body{
- font-family:system-ui,sans-serif;
- max-width:900px;
- margin:40px auto;
- padding:20px;
- line-height:1.7;
-}
-pre{
- background:#eee;
- padding:14px;
- overflow:auto;
-}
-code{
- background:#eee;
- padding:2px 4px;
-}
-table{
- border-collapse:collapse;
- width:100%;
-}
-th,td{
- border:1px solid #aaa;
- padding:7px;
-}
-blockquote{
- border-left:4px solid #555;
- padding-left:15px;
-}
-img{
- max-width:100%;
-}
-</style>
-</head>
-<body>
-<h1>${escapeHTML(doc.title)}</h1>
-${$("viewer").innerHTML}
-</body>
-</html>
-`);
-
- w.document.close();
-
- setTimeout(
-  ()=>w.print(),
-  250
- );
-}
-
-/* =========================================================
-   THEME
-========================================================= */
-
-function toggleTheme(){
-
- const light=
-  document.body.classList.toggle(
-   "light"
-  );
-
- localStorage.setItem(
-  STORAGE_THEME,
-  light
-  ?"light"
-  :"dark"
- );
-}
-
-function restoreTheme(){
-
- if(
-  localStorage.getItem(
-   STORAGE_THEME
-  )==="light"
- ){
-  document.body.classList.add("light");
- }
-}
-
-/* =========================================================
-   DRAG DROP
-========================================================= */
-
-let dragCount=0;
-
-document.addEventListener(
- "dragenter",
- e=>{
-
-  e.preventDefault();
-
-  dragCount++;
-
-  $("drop").classList.add("show");
- }
-);
-
-document.addEventListener(
- "dragover",
- e=>{
-  e.preventDefault();
- }
-);
-
-document.addEventListener(
- "dragleave",
- e=>{
-
-  e.preventDefault();
-
-  dragCount--;
-
-  if(dragCount<=0){
-   $("drop").classList.remove("show");
-  }
- }
-);
-
-document.addEventListener(
- "drop",
- async e=>{
-
-  e.preventDefault();
-
-  dragCount=0;
-
-  $("drop").classList.remove("show");
-
-  const file=
-   e.dataTransfer.files[0];
-
-  if(!file) return;
-
-  const name=
-   file.name.toLowerCase();
-
-  if(
-   !name.endsWith(".md") &&
-   !name.endsWith(".markdown")
-  ){
-
-   alert(
-    "Markdown 파일만 가져올 수 있습니다."
-   );
-
-   return;
-  }
-
-  const text=
-   await file.text();
-
-  doc={
-   id:randomID(),
-   title:file.name.replace(
-    /\.(md|markdown)$/i,
-    ""
-   ),
-   content:text,
-   permission:"public",
-   passwordHash:"",
-   encrypted:false,
-   salt:"",
-   iv:"",
-   ciphertext:"",
-   version:1,
-   updated:Date.now()
-  };
-
-  unlocked=true;
-  currentPassword=null;
-  editing=false;
-
-  await saveURL();
-
-  saveHistory();
-
-  render();
- }
-);
-
-/* =========================================================
-   DRAFT
-========================================================= */
-
-function recoverDraft(){
-
- if(
-  location.hash.startsWith("#cw=")
- ){
-  return;
- }
-
- try{
-
-  const raw=
-   localStorage.getItem(
-    STORAGE_DRAFT
-   );
-
-  if(!raw) return;
-
-  const draft=
-   JSON.parse(raw);
-
-  if(
-   !draft.savedAt ||
-   Date.now()-draft.savedAt>
-   24*60*60*1000
-  ){
-   return;
-  }
-
-  if(
-   !confirm(
-    "최근 자동 저장된 초안이 있습니다.\n"+
-    "복원하시겠습니까?"
-   )
-  ){
-   return;
-  }
-
-  if(
-   draft.encrypted
-  ){
-
-   /*
-     암호화 초안의 경우
-     currentPassword가 없으면 복원하지 않는다.
-   */
-
-   return;
-  }
-
-  doc=draft;
-  unlocked=true;
-  currentPassword=null;
-
- }catch(e){
-
-  console.warn(e);
- }
-}
-
-/* =========================================================
-   HASH NAVIGATION
-========================================================= */
-
-window.addEventListener(
- "hashchange",
- async ()=>{
-
-  await loadURL();
-
-  editing=false;
-
-  render();
- }
-);
-
-/* =========================================================
-   KEYBOARD
-========================================================= */
-
-document.addEventListener(
- "keydown",
- e=>{
-
-  if(
-   (e.ctrlKey||e.metaKey) &&
-   e.key.toLowerCase()==="f"
-  ){
-
-   e.preventDefault();
-
-   $("searchInput").focus();
-  }
-
-  if(
-   e.key==="Escape"
-  ){
-
-   document
-    .querySelectorAll(".modal-bg.open")
-    .forEach(
-     x=>x.classList.remove("open")
-    );
-  }
- }
-);
-
-/* =========================================================
-   INIT
-========================================================= */
-
-(async function(){
-
- restoreTheme();
-
- await loadURL();
-
- recoverDraft();
-
- renderLibrary();
-
- render();
-
- /*
-   최초 문서는 URL에 기록.
- */
-
- if(
-  !location.hash.startsWith("#cw=")
- ){
-
-  try{
-   await saveURL();
-  }catch(e){
-   console.error(e);
-  }
- }
-
- /*
-   자동 기록.
- */
-
- if(
-  doc.content &&
-  !doc.encrypted
- ){
-  saveHistory();
- }
-
- renderLibrary();
-
+  renderHistory();renderDocs();updateStatus();
 })();
 </script>
-
 </body>
 </html>
