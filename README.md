@@ -6,3 +6,4 @@
 노트로 적어도 되요.
 공유해도 되요
 뭐라 안해요.
+<img width="534" height="393" alt="pixil-frame-0" src="https://github.com/user-attachments/assets/27ff4045-0fb6-4a9a-b77d-2cd0ed06d5f6" />
